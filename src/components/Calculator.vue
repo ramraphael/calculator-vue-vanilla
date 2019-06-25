@@ -6,7 +6,7 @@
       @click-clear="clearAll"
       @toggle-positive-negative="togglePositiveNegative"
       @click-number="clickNumber($event)"
-      @click-decimal="addDecimal"
+      @click-decimal="clickDecimal"
       @click-operator="clickOperator($event)"
       @click-equals="evaluateResult"
     ></calculator-input>
@@ -54,8 +54,8 @@ export default {
       }
       this.currentOperand += selectedNumber;
     },
-    // Checks if continuing operation, then add decimal point if it doesn't exist
-    addDecimal() {
+    // Checks if continuing operation, then add decimal point if one doesn't exist
+    clickDecimal() {
       this.checkIfContinuingOperation();
       if (!this.currentOperand) {
         this.currentOperand = '0.';
@@ -122,7 +122,7 @@ export default {
       if (key.length === 1 && /[0-9]/.test(key)) {
         this.clickNumber(key);
       } else if (key === '.') {
-        this.addDecimal();
+        this.clickDecimal();
       } else if (/^(\+|-|\*|\/|%)$/.test(key)) {
         this.clickOperator(key);
       } else if (key === '=' || key === 'Enter') {

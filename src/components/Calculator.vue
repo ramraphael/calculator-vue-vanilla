@@ -40,6 +40,7 @@ export default {
     },
     togglePositiveNegative() {
       // Only currentOperand can be toggled, remove or add '-' as first character
+      this.checkIfContinuingOperation();
       this.currentOperand[0] === '-'
         ? (this.currentOperand = this.currentOperand.slice(1))
         : (this.currentOperand = '-'.concat(this.currentOperand));
@@ -52,10 +53,11 @@ export default {
       this.currentOperand += selectedNumber;
     },
     clickDecimal() {
+      this.checkIfContinuingOperation();
       if (!this.currentOperand) {
         this.currentOperand = '0.';
       } else if (!this.currentOperand.includes('.')) {
-        // Concat more declarative than template literals or '+' for strings
+        // Concat more readable than template literals or '+' for strings
         this.currentOperand = this.currentOperand.concat('.');
       }
     },
@@ -78,15 +80,20 @@ export default {
     },
     clickEquals() {
       // Only do calculations if there are no current results, and first and current operands exist
-      if (!this.currentResult && this.firstOperand && this.currentOperand) {
+      if (this.firstOperand && this.currentOperand) {
         this.currentResult = this.evaluate();
         this.firstOperand = '';
         this.currentOperand = '';
       }
     },
+    checkIfContinuingOperation() {
+      if (!this.currentOperand && this.currentResult) {
+        this.currentOperand = this.currentResult;
+        this.currentResult = '';
+      }
+    },
     evaluate() {
       // Returns evaluation of firstOperand, the operator and currentOperand
-      // No need for breaks, since we're returning out of the function for each case
       if (this.firstOperand && this.currentOperand && this.operator) {
         switch (this.operator) {
           case '+':
@@ -105,7 +112,7 @@ export default {
       }
     },
     onKeypress(e) {
-      // DRY function for keydown event listener
+      // keydown event listener
       const { key } = e;
       if (key.length === 1 && /[0-9]/.test(key)) {
         this.clickNumber(key);

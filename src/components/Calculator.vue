@@ -3,12 +3,12 @@
     <window-header></window-header>
     <calculator-display :currentOperand="currentOperand" :currentResult="currentResult"></calculator-display>
     <calculator-input
-      @click-clear="clickClear"
+      @click-clear="clearAll"
       @toggle-positive-negative="togglePositiveNegative"
       @click-number="clickNumber($event)"
-      @click-decimal="clickDecimal"
+      @click-decimal="addDecimal"
       @click-operator="clickOperator($event)"
-      @click-equals="clickEquals"
+      @click-equals="evaluateResult"
     ></calculator-input>
   </main>
 </template>
@@ -31,28 +31,31 @@ export default {
     currentResult: ''
   }),
   methods: {
-    clickClear() {
-      // Clear all properties
+    // Clears all properties
+    clearAll() {
       this.currentOperand = '';
       this.firstOperand = '';
       this.currentResult = '';
       this.operator = '';
     },
+    // Toggles leading '-' on currentOperand
+    // If currentResult exists, currentOperand set to currentResult and currentResult is reset
     togglePositiveNegative() {
-      // Only currentOperand can be toggled, remove or add '-' as first character
       this.checkIfContinuingOperation();
       this.currentOperand[0] === '-'
         ? (this.currentOperand = this.currentOperand.slice(1))
         : (this.currentOperand = '-'.concat(this.currentOperand));
     },
+    // Resets currentResult if it exists
+    // Otherwise appends selectedNumber to currentOperand
     clickNumber(selectedNumber) {
-      // If result exists, reset it. Append selected number to current operand
       if (this.currentResult) {
         this.currentResult = '';
       }
       this.currentOperand += selectedNumber;
     },
-    clickDecimal() {
+    // Checks if continuing operation, then add decimal point if it doesn't exist
+    addDecimal() {
       this.checkIfContinuingOperation();
       if (!this.currentOperand) {
         this.currentOperand = '0.';
@@ -61,14 +64,14 @@ export default {
         this.currentOperand = this.currentOperand.concat('.');
       }
     },
+    // Updates operator
+    // If currentResult exists, uses it as first operand
+    // Otherwise sets firstOperand to currentOperand
+    // Resets currentOperand
     clickOperator(selectedOperator) {
-      // If both firstOperand and currentOperand exist, evaluate and use result as first operand
-      // Similary, use currentResult as first operand if it's already been calculated
       // Coming from React, It feels weird to be directly mutating state...
-      if (this.firstOperand && this.currentOperand) {
-        this.firstOperand = this.evaluate();
-        this.currentOperand = '';
-      } else if (this.currentResult) {
+      evaluateResult();
+      if (this.currentResult) {
         this.firstOperand = this.currentResult;
         this.currentResult = '';
         this.currentOperand = '';
@@ -78,22 +81,24 @@ export default {
       }
       this.operator = selectedOperator;
     },
-    clickEquals() {
-      // Only do calculations if there are no current results, and first and current operands exist
+    // Sets currentResult and resets first and current operands
+    evaluateResult() {
       if (this.firstOperand && this.currentOperand) {
-        this.currentResult = this.evaluate();
+        this.currentResult = this.checkResult();
         this.firstOperand = '';
         this.currentOperand = '';
       }
     },
+    // Checks for continuing operations
+    // Sets currentOperand to currentResult and resets currentResult
     checkIfContinuingOperation() {
       if (!this.currentOperand && this.currentResult) {
         this.currentOperand = this.currentResult;
         this.currentResult = '';
       }
     },
-    evaluate() {
-      // Returns evaluation of firstOperand, the operator and currentOperand
+    // Returns evaluation of firstOperand, the operator and currentOperand
+    checkResult() {
       if (this.firstOperand && this.currentOperand && this.operator) {
         switch (this.operator) {
           case '+':
@@ -111,8 +116,8 @@ export default {
         }
       }
     },
+    // Keydown event handler
     onKeypress(e) {
-      // keydown event listener
       const { key } = e;
       if (key.length === 1 && /[0-9]/.test(key)) {
         this.clickNumber(key);

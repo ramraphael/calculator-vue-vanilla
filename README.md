@@ -1,6 +1,6 @@
 ## README
 - A simple calculator build using Vue
-- To test, run `npm install` & `npm run build-dev`
+- To test, run **`npm install`** & **`npm run build-dev`**
 - For an implementation **with** Vuex see [this repo](https://github.com/ramraphael/calculator-vue-vuex).
 
 ## Stretch features I didn't have time for

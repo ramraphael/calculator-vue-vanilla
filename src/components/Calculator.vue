@@ -39,7 +39,7 @@ export default {
       this.operator = '';
     },
     // Toggles leading '-' on currentOperand
-    // If currentResult exists, currentOperand set to currentResult and currentResult is reset
+    // In case of continuing operation, current
     togglePositiveNegative() {
       this.checkIfContinuingOperation();
       this.currentOperand[0] === '-'
@@ -70,7 +70,7 @@ export default {
     // Resets currentOperand
     clickOperator(selectedOperator) {
       // Coming from React, It feels weird to be directly mutating state...
-      evaluateResult();
+      this.evaluateResult();
       if (this.currentResult) {
         this.firstOperand = this.currentResult;
         this.currentResult = '';
@@ -122,13 +122,13 @@ export default {
       if (key.length === 1 && /[0-9]/.test(key)) {
         this.clickNumber(key);
       } else if (key === '.') {
-        this.clickDecimalPoint();
+        this.addDecimal();
       } else if (/^(\+|-|\*|\/|%)$/.test(key)) {
         this.clickOperator(key);
       } else if (key === '=' || key === 'Enter') {
-        this.clickEquals();
+        this.evaluateResult();
       } else if (key === 'Escape') {
-        this.clickClear();
+        this.clearAll();
       }
     }
   },
